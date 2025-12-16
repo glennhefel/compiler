@@ -1,0 +1,18 @@
+At line no: 7 Multiple declaration of variable c
+
+At line no: 8 array index is not of integer type : a
+
+At line no: 9 Warning: Assignment of float value into variable of integer type 
+
+At line no: 10 Modulus operator on non integer type 
+
+At line no: 11 variable is of array type : a
+
+At line no: 12 variable is of array type : a
+
+At line no: 13 Undeclared variable b
+
+At line no: 15 Undeclared variable kut
+
+
+Total errors: 8
