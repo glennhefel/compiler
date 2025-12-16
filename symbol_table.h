@@ -48,6 +48,8 @@ public:
         print_all_scopes(outlog);
         outlog << "Scopetable with ID " << current_scope->get_unique_id() << " removed" << endl
                << endl;
+        
+        outlog.flush(); // Flush immediately
 
         scope_table *temp = current_scope;
         current_scope = current_scope->get_parent_scope();
