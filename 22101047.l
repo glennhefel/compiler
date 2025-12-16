@@ -98,3 +98,21 @@ printf      { return PRINTLN; }
                 yylval = (YYSTYPE)s;
                 return CONST_FLOAT;
             }
+
+<<EOF>>    {
+                extern void write_totals();
+                extern ofstream outlog, outerror;
+                extern int lines, error_count;
+                if(outlog.is_open()){
+                    outlog<<endl<<"Total lines: "<<lines<<endl;
+                    outlog<<"Total errors: "<<error_count<<endl;
+                    outlog.flush();
+                }
+                if(outerror.is_open()){
+                    outerror<<endl<<"Total errors: "<<error_count<<endl;
+                    outerror.flush();
+                }
+                yyterminate();
+            }
+
+%%

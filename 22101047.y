@@ -1,6 +1,7 @@
 %{
 
 #include "symbol_table.h"
+#include <cstdlib>
 
 #define YYSTYPE symbol_info*
 
@@ -30,6 +31,22 @@ ofstream outlog;
 ofstream outerror;
 int error_count = 0;
 bool totals_written = false;
+
+void write_totals()
+{
+	if(!totals_written){
+		if(outlog.is_open()){
+			outlog<<endl<<"Total lines: "<<lines<<endl;
+			outlog<<"Total errors: "<<error_count<<endl;
+			outlog.flush();
+		}
+		if(outerror.is_open()){
+			outerror<<endl<<"Total errors: "<<error_count<<endl;
+			outerror.flush();
+		}
+		totals_written = true;
+	}
+}
 
 void report_error(const string &msg)
 {
@@ -103,7 +120,8 @@ start : program
 		
 		sym_table->print_all_scopes(outlog); // Print your whole symbol table here
 
-
+		// Print totals here
+		write_totals();
 	}
 	;
 
@@ -185,6 +203,8 @@ func_definition : func_decl_prefix LPAREN parameter_list RPAREN
 		}
 		compound_statement
 		{
+			write_totals();
+			
 			outlog<<"At line no: "<<lines<<" func_definition : type_specifier ID LPAREN RPAREN compound_statement "<<endl<<endl;
 			outlog<<function_return_type<<" "<<function_name<<"()\n"+$4->get_name()<<endl<<endl;
             
@@ -821,21 +841,14 @@ int main(int argc,char *argv[])
     outlog.open("22101047_log.txt", ios::trunc);
     outerror.open("22101047_error.txt", ios::trunc);
 
+    // Register atexit handler to ensure totals are written even on crash
+    atexit(write_totals);
+
     const char* path = (argc>=2) ? argv[1] : "input.c";
     yyin = fopen(path,"r");
     if(!yyin){
         if(outlog.is_open()) outlog<<"Couldn't open file"<<endl;
-        // Write totals even on failure
-        if(!totals_written){
-            if(outlog.is_open()){
-                outlog<<endl<<"Total lines: "<<lines<<endl;
-                outlog<<"Total errors: "<<error_count<<endl;
-            }
-            if(outerror.is_open()){
-                outerror<<endl<<"Total errors: "<<error_count<<endl;
-            }
-            totals_written = true;
-        }
+        write_totals();
         if(outlog.is_open()) outlog.close();
         if(outerror.is_open()) outerror.close();
         return 0;
@@ -845,21 +858,12 @@ int main(int argc,char *argv[])
 
     yyparse();
 
-    // Write totals exactly once here
-    if(!totals_written){
-        if(outlog.is_open()){
-            outlog<<endl<<"Total lines: "<<lines<<endl;
-            outlog<<"Total errors: "<<error_count<<endl;
-        }
-        if(outerror.is_open()){
-            outerror<<endl<<"Total errors: "<<error_count<<endl;
-        }
-        totals_written = true;
-    }
+    // Write totals
+    write_totals();
 
     if(yyin) fclose(yyin);
     if(outlog.is_open()) outlog.close();
     if(outerror.is_open()) outerror.close();
-    delete sym_table;
+    delete sym_table; 
     return 0;
 }
