@@ -203,8 +203,6 @@ func_definition : func_decl_prefix LPAREN parameter_list RPAREN
 		}
 		compound_statement
 		{
-			write_totals();
-			
 			outlog<<"At line no: "<<lines<<" func_definition : type_specifier ID LPAREN RPAREN compound_statement "<<endl<<endl;
 			outlog<<function_return_type<<" "<<function_name<<"()\n"+$4->get_name()<<endl<<endl;
             
@@ -841,14 +839,10 @@ int main(int argc,char *argv[])
     outlog.open("22101047_log.txt", ios::trunc);
     outerror.open("22101047_error.txt", ios::trunc);
 
-    // Register atexit handler to ensure totals are written even on crash
-    atexit(write_totals);
-
     const char* path = (argc>=2) ? argv[1] : "input.c";
     yyin = fopen(path,"r");
     if(!yyin){
         if(outlog.is_open()) outlog<<"Couldn't open file"<<endl;
-        write_totals();
         if(outlog.is_open()) outlog.close();
         if(outerror.is_open()) outerror.close();
         return 0;
@@ -858,8 +852,7 @@ int main(int argc,char *argv[])
 
     yyparse();
 
-    // Write totals
-    write_totals();
+    // Totals are written in the start rule
 
     if(yyin) fclose(yyin);
     if(outlog.is_open()) outlog.close();

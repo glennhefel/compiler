@@ -1036,27 +1036,15 @@ YY_RULE_SETUP
 case YY_STATE_EOF(INITIAL):
 #line 102 "22101047.l"
 {
-                extern void write_totals();
-                extern ofstream outlog, outerror;
-                extern int lines, error_count;
-                if(outlog.is_open()){
-                    outlog<<endl<<"Total lines: "<<lines<<endl;
-                    outlog<<"Total errors: "<<error_count<<endl;
-                    outlog.flush();
-                }
-                if(outerror.is_open()){
-                    outerror<<endl<<"Total errors: "<<error_count<<endl;
-                    outerror.flush();
-                }
                 yyterminate();
             }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 118 "22101047.l"
+#line 106 "22101047.l"
 ECHO;
 	YY_BREAK
-#line 1059 "lex.yy.c"
+#line 1047 "lex.yy.c"
 
 	case YY_END_OF_BUFFER:
 		{
@@ -2059,6 +2047,6 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 118 "22101047.l"
+#line 106 "22101047.l"
 
 

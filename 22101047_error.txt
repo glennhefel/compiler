@@ -38,5 +38,3 @@ At line no: 60 Undeclared variable h
 
 
 Total errors: 19
-
-Total errors: 19

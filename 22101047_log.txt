@@ -3091,9 +3091,6 @@ Parameter Details: int a
 
 Scopetable with ID 10 removed
 
-
-Total lines: 64
-Total errors: 19
 At line no: 64 func_definition : type_specifier ID LPAREN RPAREN compound_statement 
 
 int main()
@@ -3143,9 +3140,6 @@ return a+3;
 int main()
 a
 
-
-Total lines: 65
-Total errors: 19
 At line no: 65 start : program 
 
 Symbol Table
@@ -3230,3 +3224,6 @@ Parameter Details: int a
 
 ################################
 
+
+Total lines: 65
+Total errors: 19
