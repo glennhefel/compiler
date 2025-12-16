@@ -120,7 +120,7 @@ start : program
 		
 		sym_table->print_all_scopes(outlog); // Print your whole symbol table here
 
-		// Print totals here
+	
 		write_totals();
 	}
 	;
@@ -222,7 +222,7 @@ parameter_list : parameter_list COMMA type_specifier ID
 			outlog<<$1->get_name()<<","<<$3->get_name()<<" "<<$4->get_name()<<endl<<endl;
 					
            
-			// check duplicate parameter names in same function
+	
 			string pname = $4->get_name();
 			if(current_param_names.count(pname)){
 				report_error("Multiple declaration of variable " + pname + " in parameter of " + function_name);
@@ -482,7 +482,7 @@ statement : var_declaration
 	    	outlog<<"At line no: "<<lines<<" statement : PRINTLN LPAREN ID RPAREN SEMICOLON "<<endl<<endl;
 			outlog<<"printf("<<$3->get_name()<<");"<<endl<<endl; 
 			
-				// Lookup ID in symbol table and report undeclared variable in error file
+			
 				symbol_info *looked_up_sym = sym_table->lookup($3);
 				if(!looked_up_sym) {
 					report_error("Undeclared variable " + $3->get_name());
@@ -526,7 +526,7 @@ variable : ID
 			report_error("Undeclared variable " + $1->get_name());
 		}
 
-		// Using an array without index in expression: report and mark type void to avoid cascades
+
 		if(looked_up_sym && looked_up_sym->get_kind()=="array"){
 			report_error("variable is of array type : " + $1->get_name());
 			$$ = new symbol_info($1->get_name(), "void");
@@ -547,7 +547,7 @@ variable : ID
 	 			report_error("variable is not of array type : " + $1->get_name());
 	            err = true;
 	 		}
-	 		// Array index must be integer
+
 	 		if(!isIntegerType($3->get_type())){
 	 			report_error("array index is not of integer type : " + $1->get_name());
 	            err = true;
@@ -578,8 +578,7 @@ expression : logic_expression
 			if(looked_up_sym) {
 				string lhsType = normalizeType(looked_up_sym->get_dataType());
 				string rhsType = normalizeType($3->get_type());
-				// If RHS is a void expression and it's not a composite arithmetic expression,
-				// emit operation-on-void here to catch cases like: x = foo4(y);
+				
 				if(rhsType=="void"){
 					string rs = $3->get_name();
 					if(rs.find('+')==string::npos && rs.find('-')==string::npos && rs.find('*')==string::npos && rs.find('/')==string::npos && rs.find('%')==string::npos){
@@ -589,8 +588,7 @@ expression : logic_expression
 				if(lhsType=="void") {
 					report_error("Cannot assign to void-typed variable '" + $1->get_name() + "'");
 				}
-				// Array used without index on LHS: already reported by variable rule; avoid duplicate emission here
-				// float/double to int assignment warning
+			
 				if(isIntegerType(lhsType) && (rhsType=="float" || rhsType=="double")) {
 					report_error("Warning: Assignment of float value into variable of integer type ");
 				}
@@ -612,7 +610,7 @@ logic_expression : rel_expression
 	    	outlog<<"At line no: "<<lines<<" logic_expression : rel_expression LOGICOP rel_expression "<<endl<<endl;
 			outlog<<$1->get_name()<<$2->get_name()<<$3->get_name()<<endl<<endl;
 			
-			// Logical operator result should be integer
+			
 			$$ = new symbol_info($1->get_name()+$2->get_name()+$3->get_name(),"int");
 	     }	
 		 ;
@@ -629,7 +627,7 @@ rel_expression	: simple_expression
 	    	outlog<<"At line no: "<<lines<<" rel_expression : simple_expression RELOP simple_expression "<<endl<<endl;
 			outlog<<$1->get_name()<<$2->get_name()<<$3->get_name()<<endl<<endl;
 			
-			// Relational operator result should be integer
+			
 			$$ = new symbol_info($1->get_name()+$2->get_name()+$3->get_name(),"int");
 	    }
 		;
@@ -662,8 +660,7 @@ term :	unary_expression
      {
 	    	outlog<<"At line no: "<<lines<<" term : term MULOP unary_expression "<<endl<<endl;
 			outlog<<$1->get_name()<<$2->get_name()<<$3->get_name()<<endl<<endl;
-			// Modulus must have integer operands; division/modulus RHS not zero
-			// Using void in arithmetic is invalid; report once at the operator level
+			
 			if(normalizeType($1->get_type())=="void" || normalizeType($3->get_type())=="void"){
 				report_error("operation on void type ");
 			}
@@ -733,21 +730,21 @@ factor	: variable
 		if(!(looked_up_sym && looked_up_sym->get_kind() == "function")) {
 			report_error("Undeclared function: " + $1->get_name());
 		} else {
-			// Check parameter count
+			
 			const auto &params = looked_up_sym->get_parameters();
 			if(params.size() != current_call_arg_types.size()){
 				report_error(string("Inconsistencies in number of arguments in function call: ") + looked_up_sym->get_name());
 			}
-			// Type checks for available pairs
+			
 			size_t common = min(params.size(), current_call_arg_types.size());
 			for(size_t i=0;i<common;++i){
 				string p = normalizeType(params[i].first);
 				string a = normalizeType(current_call_arg_types[i]);
-				if(a=="void") continue; // skip cascaded errors from invalid args
+				if(a=="void") continue; 
 				bool ok = false;
 				if(p==a) ok=true;
-				else if(isIntegerType(p) && isIntegerType(a)) ok=true; // int/char compatibility
-				// else allow implicit int->float/double? keep strict to match samples
+				else if(isIntegerType(p) && isIntegerType(a)) ok=true; 
+				
 				if(!ok){
 					report_error("argument " + to_string((int)i+1) + " type mismatch in function call: " + looked_up_sym->get_name());
 				}
@@ -804,7 +801,7 @@ argument_list : arguments
 						
 					$$ = new symbol_info($1->get_name(),"arg_list");
 			  }
-			  | /* empty */
+			  | 
 			  {
 					outlog<<"At line no: "<<lines<<" argument_list :  "<<endl<<endl;
 					outlog<<""<<endl<<endl;
@@ -817,7 +814,7 @@ arguments : arguments COMMA logic_expression
 		  {
 				outlog<<"At line no: "<<lines<<" arguments : arguments COMMA logic_expression "<<endl<<endl;
 				outlog<<$1->get_name()<<","<<$3->get_name()<<endl<<endl;
-				// collect argument type
+				
 				current_call_arg_types.push_back(normalizeType($3->get_type()));
 				$$ = new symbol_info($1->get_name()+","+$3->get_name(),"arg");
 		  }
@@ -825,7 +822,7 @@ arguments : arguments COMMA logic_expression
 	      {
 				outlog<<"At line no: "<<lines<<" arguments : logic_expression "<<endl<<endl;
 				outlog<<$1->get_name()<<endl<<endl;
-				// collect argument type
+				
 				current_call_arg_types.push_back(normalizeType($1->get_type()));
 				$$ = new symbol_info($1->get_name(),"arg");
 		  }
@@ -852,7 +849,7 @@ int main(int argc,char *argv[])
 
     yyparse();
 
-    // Totals are written in the start rule
+    
 
     if(yyin) fclose(yyin);
     if(outlog.is_open()) outlog.close();
